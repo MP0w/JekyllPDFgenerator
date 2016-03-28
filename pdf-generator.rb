@@ -1,24 +1,9 @@
 module Jekyll
+    PDF_DIR = File.expand_path("../", __FILE__)+'/../'
 
-PDF_DIR = File.expand_path("../", __FILE__)+'/../'
-
-    class PDFGenerator < Generator
-        
-        safe false
-        
-        def generatePDF(page)
-            system('weasyprint http://0.0.0.0:4000'+page.url+' '+PDF_DIR+page.data['PDFTitle']+'.pdf')
-            system('echo --------------------')
-            system('echo Done Generating PDF '+page.url+' '+PDF_DIR+page.data['PDFTitle']+'.pdf')
-        end
-        
-        def generate(site)
-            site.pages.each do |page|
-                if (page.regenerate? && page.data.has_key?('isPDF'))
-                    generatePDF(page)
-                end
-            end
+    Jekyll::Hooks.register :pages, :post_render do |page|
+        if page.data.has_key?('isPDF')
+            system("weasyprint http://0.0.0.0:4000#{page.url} #{PDF_DIR}#{page.data['PDFTitle']}.pdf")
         end
     end
-    
 end
